@@ -1,0 +1,4 @@
+[debug] [migratepipeline-build] Classpath dependencies List()
+[debug] [migratepipeline-build] Dependencies from configurations List()
+[debug] Bloop wrote the configuration of project 'migratepipeline-build' to '/home/sdrafahl/code/migratepipeline/project/.bloop/migratepipeline-build.json'
+[success] Generated .bloop/migratepipeline-build.json
