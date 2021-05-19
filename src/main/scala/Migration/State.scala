@@ -1,3 +1,5 @@
-import cats.effect.Resource
+package migration
 
-case class State[C](id: Int, value: C)
+abstract class State[A]:
+    def id: Int
+    def value: Option[A]

@@ -1,5 +1,7 @@
+package migration
 
-trait StateService[F[_], A] {
-  def getCurrentState: F[State[A]]
-  def setCurrentState(s: State[A]): F[Unit]
+abstract class StateService[F[_]] {
+  def getCurrentState[A]: F[State[A]]
+  def setCurrentState[A](s: State[A]): F[Unit]
 }
+
