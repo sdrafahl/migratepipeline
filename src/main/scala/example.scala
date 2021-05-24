@@ -1,9 +1,3 @@
-# Migrate Pipeline
-
-
-## Usage
-
-```
 package migration
 
 import cats.effect.IO
@@ -27,5 +21,3 @@ def example = {
   player.play.unsafeRunSync()
 
 }
-
-```
