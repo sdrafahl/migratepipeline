@@ -1,4 +1,4 @@
-package migration
+package com.migration
 
 import io.circe._
 import io.circe.syntax._

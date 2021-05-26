@@ -1,4 +1,4 @@
-package migration
+package com.migration
 
 import cats.MonadError
 import cats.Reducible

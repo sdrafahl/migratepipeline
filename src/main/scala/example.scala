@@ -1,4 +1,4 @@
-package migration
+package com.migration
 
 import cats.effect.IO
 import cats.implicits._

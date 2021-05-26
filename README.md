@@ -30,3 +30,9 @@ def example = {
 }
 
 ```
+
+## Installing
+
+```
+libraryDependencies += "org.typelevel" % "cats-core_2.13" % "2.3.0"
+```

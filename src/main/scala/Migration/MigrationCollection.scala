@@ -1,4 +1,4 @@
-package migration
+package com.migration
 
 import cats.implicits._
 import cats.Applicative

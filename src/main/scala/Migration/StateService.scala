@@ -1,4 +1,4 @@
-package migration
+package com.migration
 
 import java.net.URI
 import cats.effect.Async
