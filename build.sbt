@@ -5,9 +5,9 @@ lazy val root = project
   .settings(
     name := "scala3-simple",
     version := "0.0.1",
-
     scalaVersion := scala3Version,
-
+    githubOwner := "sdrafahl",
+    githubRepository := "migratepipeline",
     libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
     libraryDependencies += "org.typelevel" %% "cats-core" % "2.6.0",
     libraryDependencies += "org.typelevel" %% "cats-effect" % "3.1.0",
