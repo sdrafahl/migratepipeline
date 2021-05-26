@@ -1,5 +1,6 @@
 # Migrate Pipeline
 
+[![Scala CI](https://github.com/sdrafahl/migratepipeline/actions/workflows/scala.yml/badge.svg)](https://github.com/sdrafahl/migratepipeline/actions/workflows/scala.yml)
 
 ## Usage
 
