@@ -19,13 +19,6 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - name: Run tests
-      run: sbt test
-      env:
-        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-    - name: prt
-      run: ls target
     - name: release
       run: sbt ci-release
       env:
