@@ -41,4 +41,8 @@ jobs:
         PGP_SECRET: ${{ secrets.PGP_SECRET }}
         SONATYPE_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-      run: sbt publishSigned;moveBundle;sonatypeBundleRelease;deleteBundle
+      run:
+        sbt publishSigned
+        sbt moveBundle
+        sbt sonatypeBundleRelease
+        sbt deleteBundle
