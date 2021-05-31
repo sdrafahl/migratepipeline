@@ -39,6 +39,8 @@ deleteBundle := {
   s"rm -fr ${top}" !!
 }
 
+Global / useGpgPinentry := true
+
 lazy val root = project
   .in(file("."))
   .settings(
