@@ -22,4 +22,7 @@ jobs:
     - name: Run tests
       run: sbt test
     - name: Run deployment
+      env:
+        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: publishSigned;moveBundle;sonatypeBundleRelease;deleteBundle
