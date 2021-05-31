@@ -24,8 +24,7 @@ jobs:
       env:
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-    - name: release
-      run: sbt ci-release
+    - name: release      
       env:
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -33,6 +32,7 @@ jobs:
         PGP_SECRET: ${{ secrets.PGP_SECRET }}
         SONATYPE_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+      run: sbt ci-release
     - name: Run deployment
       env:
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
