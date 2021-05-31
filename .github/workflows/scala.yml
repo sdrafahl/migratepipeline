@@ -29,4 +29,7 @@ jobs:
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         PGP_PASSPHRASE: ${{ secrets.KEY_PASSWORD }}
+        PGP_SECRET: ${{ secrets.PGP_SECRET }}
+        SONATYPE_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
       run: sbt publishSigned;moveBundle;sonatypeBundleRelease;deleteBundle
