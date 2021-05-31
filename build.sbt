@@ -1,6 +1,7 @@
 import java.io.File
 import java.nio.file.{Files, Path, StandardCopyOption}
 import scala.sys.process._
+import xerial.sbt.Sonatype._
 
 val scala3Version = "3.0.0"
 
@@ -12,7 +13,7 @@ sonatypeCredentialHost := "s01.oss.sonatype.org"
 sonatypeProfileName := "io.github.sdrafahl"
 licenses := Seq("MIT" -> url("https://github.com/sdrafahl/migratepipeline/blob/master/LICENSE"))
 
-import xerial.sbt.Sonatype._
+
 sonatypeProjectHosting := Some(GitHubHosting("sdrafahl", "migratepipeline", "shanedrafahl@gmail.com"))
 
 credentials += Credentials(
