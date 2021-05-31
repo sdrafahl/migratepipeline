@@ -21,3 +21,5 @@ jobs:
         distribution: 'adopt'
     - name: Run tests
       run: sbt test
+    - name: Run deployment
+      run: publishSigned;moveBundle;sonatypeBundleRelease;deleteBundle
