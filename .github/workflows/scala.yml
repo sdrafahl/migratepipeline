@@ -25,7 +25,7 @@ jobs:
         NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
     - name: prt
-      run: ls
+      run: ls target
     - name: release
       run: sbt ci-release
       env:
