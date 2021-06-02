@@ -19,7 +19,7 @@ sonatypeProjectHosting := Some(GitHubHosting("sdrafahl", "migratepipeline", "sha
 credentials += Credentials(
   "GnuPG Key ID",
   "gpg",
-  "8A8F024F09218CB1F950BD1CA65EBB35D6A69D5E", // key identifier
+  "76DA99CA42B1819F85F0F09905F8D10A76F31F69", // key identifier
   scala.sys.env("KEY_PASSWORD")
 )
 
