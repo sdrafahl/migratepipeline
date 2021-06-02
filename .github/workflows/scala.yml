@@ -19,6 +19,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
+    - uses: olafurpg/setup-scala@v10
     - name: release
       run: sbt ci-release
       env:

@@ -15,14 +15,7 @@ licenses := Seq("MIT" -> url("https://github.com/sdrafahl/migratepipeline/blob/m
 
 
 sonatypeProjectHosting := Some(GitHubHosting("sdrafahl", "migratepipeline", "shanedrafahl@gmail.com"))
-
-credentials += Credentials(
-  "GnuPG Key ID",
-  "gpg",
-  "76DA99CA42B1819F85F0F09905F8D10A76F31F69", // key identifier
-  scala.sys.env("KEY_PASSWORD")
-)
-
+usePgpKeyHex("76DA99CA42B1819F85F0F09905F8D10A76F31F69")
 ThisBuild / versionScheme := Some("pvp")
 
 sonatypeBundleDirectory := (ThisBuild / baseDirectory).value / target.value.getName / "sonatype-staging" / (ThisBuild / version).value 
@@ -39,7 +32,7 @@ deleteBundle := {
   s"rm -fr ${top}" !!
 }
 
-Global / useGpgPinentry := true
+//Global / useGpgPinentry := true
 
 lazy val root = project
   .in(file("."))
