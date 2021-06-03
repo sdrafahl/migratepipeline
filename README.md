@@ -34,5 +34,5 @@ def example = {
 ## Installing
 
 ```
-libraryDependencies += "org.typelevel" % "cats-core_2.13" % "2.3.0"
+libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.1"
 ```
