@@ -43,6 +43,8 @@ sonatypeProjectHosting := Some(GitHubHosting("sdrafahl", "migratepipeline", "sha
 usePgpKeyHex("76DA99CA42B1819F85F0F09905F8D10A76F31F69")
 ThisBuild / versionScheme := Some("pvp")
 
+useGpgPinentry := true
+
 lazy val root = project
   .in(file("."))
   .settings(
