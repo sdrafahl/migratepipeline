@@ -13,6 +13,8 @@ sealed abstract class Migration[B] {
   def currentState: () => State
 }
 
+type UnitMigration = Migration[Unit] 
+
 object Migration {
   def apply[B](n: () => String, u: () => MigrationResultSignal[B], d: () => Unit, migrationState :() => State, cState: () => State) = new Migration[B] {
     def name = n
@@ -99,7 +101,7 @@ object Migration {
 
   given migrationMonad(using app: Applicative[Migration]): Monad[Migration] with {
     override def pure[A](a: A): Migration[A] = app.pure(a)
-    override def flatMap[A, B](fa: Migration[A])(f: A => Migration[B]): Migration[B] = Migration.flatten(app.map(fa)(f))      
+    override def flatMap[A, B](fa: Migration[A])(f: A => Migration[B]): Migration[B] = Migration.flatten(app.map(fa)(f)) 
     override def tailRecM[A, B](a: A)(f: A => Migration[Either[A, B]]): Migration[B] = {
       lazy val migration = f(a)
       if(migration.state().id > migration.currentState().id) {
