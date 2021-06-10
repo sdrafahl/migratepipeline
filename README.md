@@ -6,29 +6,36 @@
 ## Usage
 
 ```
-package migration
+package com.migration
 
 import cats.effect.IO
 import cats.implicits._
 import java.net.URI
 import cats.effect.unsafe.implicits.global
+import com.migration.MigrationResultSignal._
+import com.migration.MigrationEffectOps.given
 
 def example = {
-  val migrations = List(
-    BracketMigration[IO, Unit]("Migration 0", IO(println("Running Migration 0")), IO.unit),
-    BracketMigration[IO, Unit]("Migration 1", IO(println("Running Migration 1")), IO.unit),
-    BracketMigration[IO, Unit]("Migration 2", IO(println("Running Migration 2")), IO.unit)
-  )
 
-  given migrationCollection: MigrationCol[IO, Map, List] = MigrationCol.fromList[IO](migrations)
+  val currentState = State(0)
 
-  given fileState: StateService[IO] = LocalFileStateService.createLocalFileStateService[IO](new URI("teststatefile.json"))
+  val migration: Migration[String] = for {
+    migration1 <- Migration(() => "Migration 0", () => Success("a"), () => println("cleaning up migration 0"), () => State(0),() => currentState)
+    migration2 <- Migration(() => "Migration 1", () => Success("c"), () => println("cleaning up migration 1"), () => State(1),() => currentState)
+    migration3 <- Migration(() => "Migration 2", () => Success("d"), () => println("cleaning up migration 2"), () => State(2),() => currentState)
+  } yield migration3
 
-  val player = summon[MigrationPlayer[IO]]
+  val migrationAsEffect: IO[MigrationResult[String]] = migration.corollary[IO]
 
-  player.play.unsafeRunSync()
+  println(migrationAsEffect.unsafeRunSync())
 
+  /**
+    Prints 
+   ResultSuccess(d,Migration 0 -----> (pure) ----> (pure) ----> Migration 1 -----> (pure) ----> (pure) ----> Migration 2 -----> (pure) ----> (pure) ----> (pure))
+    */
+  
 }
+
 
 ```
 

@@ -1,11 +1,9 @@
 name: Scala CI
-
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-
 jobs:
   build:
     env:
@@ -19,23 +17,5 @@ jobs:
       with:
         java-version: '11'
         distribution: 'adopt'
-    - uses: olafurpg/setup-scala@v10
-    - run: sbt ci-release
-      env:
-        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        PGP_PASSPHRASE: ${{ secrets.KEY_PASSWORD }}
-        PGP_SECRET: ${{ secrets.PGP_SECRET }}
-        SONATYPE_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}        
-    - name: release
-      run: sbt publishSigned
-      env:
-        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        PGP_PASSPHRASE: ${{ secrets.KEY_PASSWORD }}
-        PGP_SECRET: ${{ secrets.PGP_SECRET }}
-        SONATYPE_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
-        SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}        
-        
+    - uses: olafurpg/setup-scala@v10        
         
