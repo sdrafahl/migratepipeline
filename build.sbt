@@ -2,10 +2,11 @@ import java.io.File
 import java.nio.file.{Files, Path, StandardCopyOption}
 import scala.sys.process._
 import xerial.sbt.Sonatype._
+import scala.util.Try
 
 val scala3Version = "3.0.0"
 
-credentials += Credentials("Sonatype Nexus Repository Manager", "s01.oss.sonatype.org", "sdrafahl", scala.sys.env("NEXUS_PASSWORD"))
+credentials += Credentials("Sonatype Nexus Repository Manager", "s01.oss.sonatype.org", "sdrafahl", Try(scala.sys.env("NEXUS_PASSWORD")).getOrElse(""))
 
 organization := "io.github.sdrafahl"
 organizationName := "sdrafahl"
@@ -47,7 +48,7 @@ lazy val root = project
   .in(file("."))
   .settings(
     name := "migrationpipeline",
-    version := "0.0.1",
+    version := "0.0.2",
     scalaVersion := scala3Version,    
     libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
     libraryDependencies += "org.typelevel" % "cats-core_2.13" % "2.3.0",
