@@ -7,6 +7,7 @@ import com.migration.MigrationResult._
 
 abstract class MigrationEffectOps {
   extension [A](m: Migration[A]) def corollary[F[_]](using S: Sync[F]): F[MigrationResult[A]]
+  extension [A](m: Migration[A]) def corolarryDown[F[_]](using S: Sync[F]): F[Unit]
 }
 
 object MigrationEffectOps {
@@ -20,5 +21,6 @@ object MigrationEffectOps {
         case Right(NoOpMigration) => S.pure(NoMigrationWasRan)
       }      
     }
+    extension [A](m: Migration[A]) def corolarryDown[F[_]](using S: Sync[F]): F[Unit] = S.delay(m.down())
   }
 }
