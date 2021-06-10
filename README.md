@@ -14,16 +14,29 @@ import java.net.URI
 import cats.effect.unsafe.implicits.global
 import com.migration.MigrationResultSignal._
 import com.migration.MigrationEffectOps.given
+import com.migration.FlatMapUnitOps._
 
 def example = {
 
-  val currentState = State(0)
+  val currentState = State(1)
 
   val migration: Migration[String] = for {
     migration1 <- Migration(() => "Migration 0", () => Success("a"), () => println("cleaning up migration 0"), () => State(0),() => currentState)
     migration2 <- Migration(() => "Migration 1", () => Success("c"), () => println("cleaning up migration 1"), () => State(1),() => currentState)
     migration3 <- Migration(() => "Migration 2", () => Success("d"), () => println("cleaning up migration 2"), () => State(2),() => currentState)
   } yield migration3
+
+  val m4: UnitMigration = Migration(() => "Migration 0", () => Success(()), () => println("cleaning up migration 0"), () => State(0),() => currentState) <+>
+  Migration(() => "Migration 1", () => Success(()), () => println("cleaning up migration 1"), () => State(1),() => currentState) <+>
+  Migration(() => "Migration 2", () => Success(()), () => println("cleaning up migration 2"), () => State(2),() => currentState)
+
+  println(m4.corollary[IO].unsafeRunSync())
+
+  /**
+    Prints
+    Skips migrations
+    ResultSuccess((),Migration 1 ----> Migration 2)
+    */
 
   val migrationAsEffect: IO[MigrationResult[String]] = migration.corollary[IO]
 
@@ -42,5 +55,5 @@ def example = {
 ## Installing
 
 ```
-libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.2"
+libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.3"
 ```
