@@ -51,11 +51,11 @@ object Migration {
           fa.down()
           ff.down()
         }
-        val newName = () => s"${fa.name} ----> ${ff.down}"
+        val newName = () => s"${fa.name()} -----> ${ff.name()}"
         Migration(newName, newUp, newDown, ff.state, ff.currentState)
       }      
     }
-    override def pure[A](a: A): Migration[A] = Migration(() => s"Pure Value ${a}", () => Success(a), () => (), () => State(0), () => State(0))
+    override def pure[A](a: A): Migration[A] = Migration(() => s"(pure)", () => Success(a), () => (), () => State(0), () => State(0))
     override def map[A, B](fa: Migration[A])(f: A => B): Migration[B] = ap(pure(f))(fa)
   }
 
@@ -83,7 +83,7 @@ object Migration {
     lazy val newName = () =>  secondMigration match {
       case FailedMigration => "Failed Migration"
       case NoOpMigration => "No Op"
-      case Success(a) => s"${x.name} ----> ${a.name}"
+      case Success(a) => s"${x.name()} ----> ${a.name()}"
     }
 
     lazy val newState = () => {
@@ -109,7 +109,7 @@ object Migration {
           case FailedMigration => Migration(migration.name,() => FailedMigration, () => (), migration.state, migration.currentState)
           case NoOpMigration => Migration(migration.name,() => NoOpMigration, () => (), migration.state, migration.currentState)
           case Success(Left(l)) => tailRecM(a)(f)
-          case Success(Right(r)) => Migration(() => s"${migration.name}", () => Success(r), migration.down, migration.state, migration.currentState)          
+          case Success(Right(r)) => Migration(() => s"${migration.name()}", () => Success(r), migration.down, migration.state, migration.currentState)          
         }
       }
     }

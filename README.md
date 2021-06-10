@@ -30,10 +30,11 @@ def example = {
 
   /**
     Prints 
-    ResultSuccess(d)
+   ResultSuccess(d,Migration 0 -----> (pure) ----> (pure) ----> Migration 1 -----> (pure) ----> (pure) ----> Migration 2 -----> (pure) ----> (pure) ----> (pure))
     */
   
 }
+
 
 ```
 

@@ -15,7 +15,7 @@ object MigrationEffectOps {
       val downEffect = S.delay(m.down())
       S.delay(m.up()).attempt.flatMap{
         case Left(_) => downEffect.map(_ => DownMigrationRan)
-        case Right(Success(a)) => S.delay(ResultSuccess(a))
+        case Right(Success(a)) => S.delay(ResultSuccess(a, m.name()))
         case Right(FailedMigration) => downEffect.map(_ => DownMigrationRan)
         case Right(NoOpMigration) => S.pure(NoMigrationWasRan)
       }      
