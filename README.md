@@ -42,5 +42,5 @@ def example = {
 ## Installing
 
 ```
-libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.2"
+libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.4"
 ```
