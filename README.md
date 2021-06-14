@@ -20,40 +20,58 @@ def example = {
 
   val currentState = State(1)
 
-  val migration: Migration[String] = for {
-    migration1 <- Migration(() => "Migration 0", () => Success("a"), () => println("cleaning up migration 0"), () => State(0),() => currentState)
-    migration2 <- Migration(() => "Migration 1", () => Success("c"), () => println("cleaning up migration 1"), () => State(1),() => currentState)
-    migration3 <- Migration(() => "Migration 2", () => Success("d"), () => println("cleaning up migration 2"), () => State(2),() => currentState)
-  } yield migration3
+  given StateService[IO] with {
+    def getCurrentState: IO[State] = IO(currentState)
+    def setCurrentState(s: State): IO[Unit] = IO.unit
+  }
 
-  val m4: UnitMigration = Migration(() => "Migration 0", () => Success(()), () => println("cleaning up migration 0"), () => State(0),() => currentState) <+>
-  Migration(() => "Migration 1", () => Success(()), () => println("cleaning up migration 1"), () => State(1),() => currentState) <+>
-  Migration(() => "Migration 2", () => Success(()), () => println("cleaning up migration 2"), () => State(2),() => currentState)
+  val migrationPlayer = MigrationPlayer[IO]  
 
-  println(m4.corollary[IO].unsafeRunSync())
+  val migration = for {
+    m1 <- Migration.createMigration("Migration 0", () => Success(()), () => println("cleaning up migration 0"), State(0))
+    m2 <- Migration.createMigration("Migration 1", () => Success(()), () => println("cleaning up migration 1"), State(1))
+    m3 <- Migration.createMigration("Migration 2", () => Success(()), () => println("cleaning up migration 2"), State(2))
+    migration = (m1 ==> m2 ==> m3)
+    resultOfrunningTheMigration <- migrationPlayer.runMigrationsFromLatestState(migration)
+  } yield resultOfrunningTheMigration
 
-  /**
-    Prints
-    Skips migrations
+  println(migration.unsafeRunSync())
+
+  /**    
+    Skips migration 1 because the current state is 1
+
+    Prints: 
     ResultSuccess((),Migration 1 ----> Migration 2)
     */
 
-  val migrationAsEffect: IO[MigrationResult[String]] = migration.corollary[IO]
 
-  println(migrationAsEffect.unsafeRunSync())
+  val migrationValue = for {
+    m1 <- Migration.createMigration("Migration 0", () => Success("a"), () => println("cleaning up migration 0"), State(0))
+    m2 <- Migration.createMigration("Migration 1", () => Success("b"), () => println("cleaning up migration 1"), State(1))
+    m3 <- Migration.createMigration("Migration 2", () => Success("c"), () => println("cleaning up migration 2"), State(2))
+    migration = for {
+      a <- m1
+      b <- m2
+      c <- m3
+    } yield c
+    resultOfrunningTheMigration <- migrationPlayer.runMigrationsFromLatestState(migration)
+  } yield resultOfrunningTheMigration
 
-  /**
-    Prints 
-   ResultSuccess(d,Migration 0 -----> (pure) ----> (pure) ----> Migration 1 -----> (pure) ----> (pure) ----> Migration 2 -----> (pure) ----> (pure) ----> (pure))
+  println(migrationValue.unsafeRunSync())
+
+  /**    
+    Skips all migrations in for comprehension because migration m1 is behind the current state
+
+    Prints: 
+    NoMigrationWasRan
     */
   
 }
-
 
 ```
 
 ## Installing
 
 ```
-libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.4"
+libraryDependencies += "io.github.sdrafahl" %% "migrationpipeline" % "0.0.5"
 ```
