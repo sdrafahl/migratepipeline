@@ -4,6 +4,7 @@ import com.migration.MigrationResultSignal._
 import cats.Applicative
 import cats.Monad
 import cats.ApplicativeError
+import cats.implicits._
 
 sealed abstract class Migration[B] {
   def name: () => String
@@ -22,9 +23,9 @@ object Migration {
         u() match {
           case Success(b) => Success(b)
           case NoOpMigration => NoOpMigration
-          case FailedMigration => {
+          case FailedMigration(msg) => {
             d()
-            FailedMigration
+            FailedMigration(msg)
           }
         }
     }
@@ -32,6 +33,12 @@ object Migration {
     def state = migrationState
     def currentState = cState
   }
+
+  def createMigration[F[_]: StateService: Monad, B](label: String, up: () => MigrationResultSignal[B], down: () => Unit, state: State) = for {
+    currentState <- summon[StateService[F]].getCurrentState
+    m = Migration(() => label, up, down, () => state, () => currentState)
+  } yield m
+
   given applicative[A]: Applicative[Migration] with {
     override def ap[A, B](ff: Migration[A => B])(fa: Migration[A]): Migration[B] = {
       if(fa.currentState().id > fa.state().id || ff.currentState().id > ff.state().id) {
@@ -40,10 +47,10 @@ object Migration {
         val newUp: () => MigrationResultSignal[B] = () => {
         val result = fa.up()
         result match {
-          case FailedMigration => FailedMigration
+          case FailedMigration(msg) => FailedMigration(msg)
           case NoOpMigration => NoOpMigration
           case Success(a) => ff.up() match {
-            case FailedMigration => FailedMigration
+            case FailedMigration(msg) => FailedMigration(msg)
             case NoOpMigration => NoOpMigration
             case Success(af) => Success(af(a))
           }
@@ -68,7 +75,7 @@ object Migration {
     lazy val newUp: () => MigrationResultSignal[A] = () => {
       secondMigration match {
         case NoOpMigration => NoOpMigration
-        case FailedMigration => FailedMigration
+        case FailedMigration(msg) => FailedMigration(msg)
         case Success(a) => a.up()
       }
     }
@@ -76,21 +83,21 @@ object Migration {
     lazy val newDown: () => Unit = () => {
       x.down
       secondMigration match {
-        case FailedMigration => ()
+        case FailedMigration(_) => ()
         case NoOpMigration => ()
         case Success(a) => a.down
       }
     }
 
     lazy val newName = () =>  secondMigration match {
-      case FailedMigration => "Failed Migration"
+      case FailedMigration(_) => "Failed Migration"
       case NoOpMigration => "No Op"
       case Success(a) => s"${x.name()} ----> ${a.name()}"
     }
 
     lazy val newState = () => {
       secondMigration match {
-        case FailedMigration => x.state()
+        case FailedMigration(_) => x.state()
         case NoOpMigration => x.state()
         case Success(a) => State(Math.max(x.state().id, a.state().id))
       }
@@ -108,7 +115,7 @@ object Migration {
         Migration(migration.name, () => NoOpMigration, migration.down, migration.state, migration.currentState)
       } else {
         migration.up() match {
-          case FailedMigration => Migration(migration.name,() => FailedMigration, () => (), migration.state, migration.currentState)
+          case FailedMigration(msg) => Migration(migration.name,() => FailedMigration(msg), () => (), migration.state, migration.currentState)
           case NoOpMigration => Migration(migration.name,() => NoOpMigration, () => (), migration.state, migration.currentState)
           case Success(Left(l)) => tailRecM(a)(f)
           case Success(Right(r)) => Migration(() => s"${migration.name()}", () => Success(r), migration.down, migration.state, migration.currentState)          
