@@ -3,15 +3,28 @@ package com.migration
 import cats.MonadError
 import com.migration.MigrationResultSignal._
 import cats.implicits._
+import MigrationResult._
 
 abstract class MigrationOps[F[_]] {
-  extension [A](firstMigration: Migration[F, A]) def ==>[C](secondMigration: Migration[F, C]): Migration[F, C]
-  extension [A](firstMigration: Migration[F, A]) def -->[C](secondMigration: Migration[F, C]): Migration[F, (A, C)]
+  extension [A, C](firstMigration: Migration[F, A]) def ==> (secondMigration: Migration[F, C]): Migration[F, C]
+  extension [A, C](firstMigration: Migration[F, A]) def --> (secondMigration: Migration[F, C]): Migration[F, (A, C)]
+  extension [A](migration: F[Migration[F, A]]) def runMigration: F[MigrationResult[A]]
 }
 
 object MigrationOps {
   given migrationOps[F[_]](using me: MonadError[F, Throwable]): MigrationOps[F] with {
-    extension [A](firstMigration: Migration[F, A]) def ==>[C](secondMigration: Migration[F, C]): Migration[F, C] = {
+    extension [A](migration: F[Migration[F, A]]) def runMigration: F[MigrationResult[A]] = {
+      for {
+        mig <- migration
+        signal <- mig.runUp
+        result = signal match {
+          case Success(va) => ResultSuccess(va, mig.label)
+          case FailedMigration(err) => ErrorRunningMigration(err, mig.label)
+          case NoOpMigration => NoMigrationWasRan
+        }
+      } yield result
+    }
+    extension [A, C](firstMigration: Migration[F, A]) def ==> (secondMigration: Migration[F, C]): Migration[F, C] = {
       if(firstMigration.currentState.id >= secondMigration.state.id) {
         secondMigration
       } else {
@@ -38,7 +51,7 @@ object MigrationOps {
         Migration(newUp, newDown, secondMigration.state, secondMigration.currentState, s"${firstMigration.label} ------------> ${secondMigration.label}")
       }
     }
-    extension [A](firstMigration: Migration[F, A]) def -->[C](secondMigration: Migration[F, C]): Migration[F, (A, C)] = {
+    extension [A, C](firstMigration: Migration[F, A]) def --> (secondMigration: Migration[F, C]): Migration[F, (A, C)] = {
       if(firstMigration.currentState.id >= secondMigration.state.id) {
         Migration(me.pure(NoOpMigration), firstMigration.down, firstMigration.state, firstMigration.currentState, s"${firstMigration.label} ------------> no op")
       } else {

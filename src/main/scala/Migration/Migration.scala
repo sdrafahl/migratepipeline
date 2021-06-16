@@ -24,6 +24,11 @@ object Migration {
     def currentState = cState
     def label = lab
   }
+
+  def createMigration[F[_]: StateService: Monad, B](upMi: F[MigrationResultSignal[B]], dow: F[Unit], st: State, label: String): F[Migration[F, B]] = for {
+    currentState <- summon[StateService[F]].getCurrentState
+    migration = Migration(upMi, dow, st, currentState, label)
+  } yield migration
  
   def map[F[_]: Applicative, B, C](f: B => C)(migration: Migration[F, B]): Migration[F, C] = {
     val newUp = migration.runUp.map(m => m.map(f))
